@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="ko" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>취미 소개 & 우주 전사 버즈의 모험</title>
+    <!-- Tailwind CSS (UI 스타일링) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts (주아체 및 나눔고딕) -->
+    <link href="https://fonts.googleapis.com/css2?family=Jua&family=Nanum+Gothic:wght@400;700;800&display=swap" rel="stylesheet">
+    <script>
+        // Tailwind의 다크모드 설정을 클래스 기준으로 적용
+        tailwind.config = {
+            darkMode: 'class'
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Jua', 'Nanum Gothic', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+        /* 취미 소개 구역 전용 깔끔하고 정적인 폰트 스타일 */
+        .clean-hobby-font {
+            font-family: 'Nanum Gothic', sans-serif;
+        }
+        
+        /* 하늘 섹션 배경 애니메이션 (구름 효과) */
+        .sky-bg {
+            position: relative;
+            overflow: hidden;
+            transition: background 0.4s ease;
+        }
+        .cloud {
+            position: absolute;
+            border-radius: 9999px;
+            filter: blur(4px);
+            animation: float 25s infinite linear;
+            transition: background-color 0.4s ease, opacity 0.4s ease;
+        }
+        @keyframes float {
+            0% { transform: translateX(-150px); }
+            100% { transform: translateX(calc(100vw + 150px)); }
+        }
+
+        /* 게임 캔버스 배경 (풀밭 텍스처) */
+        #gameCanvas {
+            background-color: #38a169; /* 조금 더 짙은 잔디색 */
+            background-image: 
+                radial-gradient(#48bb78 15%, transparent 20%),
+                radial-gradient(#2f855a 15%, transparent 20%);
+            background-size: 50px 50px;
+            background-position: 0 0, 25px 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+        }
+
+        /* 일시정지 오버레이 스타일 */
+        .pause-overlay {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(6px);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 overflow-x-hidden transition-colors duration-300">
+
+    <!-- 상단 고정 헤더 GNB -->
+    <header class="fixed top-0 left-0 right-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-sky-100 dark:border-slate-800 py-3.5 px-6 flex justify-between items-center z-50 shadow-sm transition-colors duration-300">
+        <a href="#" class="flex items-center gap-2">
+            <span class="text-2xl">🎬</span>
+            <span class="text-lg md:text-xl font-bold text-slate-800 dark:text-slate-100 tracking-wider">My Hobby & Toy Story</span>
+        </a>
+        <nav class="flex items-center gap-4 md:gap-6">
+            <a href="#hobby-section" class="text-sm md:text-base text-slate-600 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 font-bold transition-colors">취미 소개</a>
+            <a href="#intro-section" class="text-sm md:text-base text-slate-600 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 font-bold transition-colors">영화 추천</a>
+            
+            <!-- 다크모드 토글 버튼 -->
+            <button id="themeToggleBtn" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-yellow-400 hover:scale-105 active:scale-95 transition-all" aria-label="테마 전환">
+                <!-- 달 아이콘 (라이트 모드일 때 보임) -->
+                <svg id="moonIcon" class="w-5 h-5 block dark:hidden" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+                <!-- 해 아이콘 (다크 모드일 때 보임) -->
+                <svg id="sunIcon" class="w-5 h-5 hidden dark:block" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464l-.707-.707a1 1 0 00-1.414 1.414l.707.707a1 1 0 001.414-1.414zm2.12 10.607a1 1 0 010-1.414l.706-.707a1 1 0 111.414 1.414l-.707.707a1 1 0 01-1.414 0zM4 11a1 1 0 100-2H3a1 1 0 100 2h1z" clip-rule="evenodd"></path></svg>
+            </button>
+
+            <a href="#game-section" id="goGameBtn" class="bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-400 text-slate-950 font-black text-xs md:text-sm px-4 py-2 rounded-xl border-b-4 border-amber-600 active:border-b-0 active:translate-y-0.5 transition-all shadow-md">
+                🎮 게임하러 가기
+            </a>
+        </nav>
+    </header>
+
+    <!-- 섹션 1: 나의 취미 소개 (라이트/다크에 따라 변하는 모던 시네마틱 스타일) -->
+    <section id="hobby-section" class="clean-hobby-font min-h-screen pt-28 pb-16 px-6 flex flex-col justify-center items-center bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-950 dark:via-slate-900 dark:to-slate-900 relative transition-all duration-300">
+        <!-- 은은한 무대 조명 백라이트 효과 -->
+        <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[250px] bg-sky-500/10 rounded-full blur-[120px] pointer-events-none"></div>
+
+        <div class="max-w-4xl w-full text-center space-y-10 relative z-10">
+            <div class="inline-block bg-slate-200 dark:bg-slate-800 text-sky-600 dark:text-sky-400 font-bold text-xs md:text-sm px-5 py-2 rounded-full border border-slate-300 dark:border-slate-700 tracking-widest uppercase transition-colors duration-300">
+                INTRODUCE MY HOBBY
+            </div>
+
+            <!-- 핵심 인트로 메시지 -->
+            <div class="space-y-6">
+                <h1 class="text-3xl md:text-5xl font-extrabold text-slate-950 dark:text-white leading-tight tracking-tight drop-shadow-md transition-colors duration-300">
+                    저의 취미는 <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-500 to-indigo-500 dark:from-sky-400 dark:to-indigo-400">영화 감상</span> 입니다.
+                </h1>
+                <p class="text-base md:text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto font-normal leading-relaxed tracking-wide transition-colors duration-300">
+                    영화관에서 하나의 스크린에 몰두하는 경험을 좋아하게 되어 영화를 좋아하게 되었습니다.
+                </p>
+            </div>
+
+            <!-- 신뢰감 있는 영화 관련 요소 카드형 배치 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6">
+                <!-- 카드 1: 스크린의 몰입감 -->
+                <div class="bg-white/80 dark:bg-slate-900/60 backdrop-blur-md border border-slate-200 dark:border-slate-800/80 p-8 rounded-3xl text-left space-y-4 hover:border-sky-500/30 dark:hover:border-sky-500/30 transition-all duration-300">
+                    <div class="text-3xl">🏛️</div>
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-white transition-colors duration-300">어두운 공간 속, 온전한 몰입</h3>
+                    <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-light transition-colors duration-300">
+                        스마트폰의 알림과 일상의 소음에서 벗어나, 오직 단 하나의 거대한 화면에 시선과 마음을 집중할 때 펼쳐지는 고요하고 강력한 경험을 사랑합니다.
+                    </p>
+                </div>
+                <!-- 카드 2: 무한한 상상력과의 만남 -->
+                <div class="bg-white/80 dark:bg-slate-900/60 backdrop-blur-md border border-slate-200 dark:border-slate-800/80 p-8 rounded-3xl text-left space-y-4 hover:border-sky-500/30 dark:hover:border-sky-500/30 transition-all duration-300">
+                    <div class="text-3xl">🌌</div>
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-white transition-colors duration-300">무한한 공간 저 너머의 세계</h3>
+                    <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-light transition-colors duration-300">
+                        상상해본 적 없는 타인의 일생부터, 살아 움직이는 장난감들이 들려주는 따뜻한 우정의 대서사시까지 영화는 매번 저를 완벽한 모험 속으로 데려다줍니다.
+                    </p>
+                </div>
+            </div>
+
+            <!-- 다음 구역 유도 버튼 -->
+            <div class="pt-8">
+                <a href="#intro-section" class="inline-flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors text-xs md:text-sm font-semibold border border-slate-300 dark:border-slate-800 hover:border-slate-400 bg-white/40 dark:bg-slate-950/40 px-6 py-3.5 rounded-full tracking-wide">
+                    최근 제가 푹 빠진 추천 영화 보기
+                    <svg class="w-4 h-4 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 13l-7 7-7-7m14-6l-7 7-7-7"></path></svg>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 섹션 2: 토이스토리 5 소개 (하늘색/밤하늘색 가변 배경 - 본문 및 제목에 주아체로 친근함 강조) -->
+    <section id="intro-section" class="sky-bg bg-gradient-to-b from-sky-200 to-sky-50 dark:from-slate-950 dark:to-slate-900 min-h-screen pb-16 px-6 flex flex-col justify-center items-center relative border-t border-sky-100 dark:border-slate-800 transition-colors duration-300">
+        <!-- 구름 데코레이션 배경 생성 (테마별 스타일) -->
+        <div class="cloud w-44 h-16 top-28 left-[-100px] bg-white/60 dark:bg-indigo-900/20 dark:backdrop-blur-sm" style="animation-delay: 0s; opacity: 0.7;"></div>
+        <div class="cloud w-64 h-24 top-64 left-[-200px] bg-white/60 dark:bg-indigo-900/20 dark:backdrop-blur-sm" style="animation-delay: 8s; opacity: 0.5;"></div>
+        <div class="cloud w-36 h-12 top-1/2 left-[-150px] bg-white/60 dark:bg-indigo-900/20 dark:backdrop-blur-sm" style="animation-delay: 15s; opacity: 0.6;"></div>
+
+        <div class="max-w-5xl w-full grid grid-cols-1 lg:grid-cols-12 gap-10 items-center relative z-10 pt-16">
+            <!-- 왼쪽: 영화 소개 타이틀 & 시놉시스 -->
+            <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+                <div class="inline-block bg-sky-500/10 dark:bg-sky-400/10 text-sky-700 dark:text-sky-400 font-extrabold text-sm px-4 py-1.5 rounded-full border border-sky-200 dark:border-sky-900/50 transition-colors duration-300">
+                    🎬 최고의 몰입을 선사한 최신 추천작!
+                </div>
+                <h1 class="text-4xl md:text-5xl font-black text-slate-900 dark:text-white leading-tight transition-colors duration-300">
+                    토이 스토리 5<br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-500 via-purple-500 to-pink-500 dark:from-sky-400 dark:via-purple-400 dark:to-pink-400">Toy Story 5</span>
+                </h1>
+                
+                <div class="bg-white/70 dark:bg-slate-900/80 backdrop-blur-md rounded-2xl p-6 md:p-8 border border-white/50 dark:border-slate-800/80 shadow-lg space-y-4 text-slate-700 dark:text-slate-300 transition-colors duration-300">
+                    <h3 class="text-lg md:text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <span>🌟</span> 시놉시스 (Synopsis)
+                    </h3>
+                    <p class="text-sm md:text-base leading-relaxed">
+                        앤디의 품을 떠나 새로운 주인을 만났던 장난감 친구들에게 디지털 네이티브 세대의 유행이라는 최대의 위기가 찾아옵니다! 스마트폰, 태블릿, 그리고 스마트 스크린 인터페이스의 대유행 속에 방구석 깊은 곳으로 밀려나게 된 우디와 버즈 일행.
+                    </p>
+                    <p class="text-sm md:text-base leading-relaxed font-semibold text-slate-800 dark:text-slate-200">
+                        "진정한 사랑과 교감은 가상현실 속 디지털 코드가 아니야!"
+                    </p>
+                    <p class="text-sm md:text-base leading-relaxed">
+                        아이들의 진짜 상상력과 소중한 동심을 되찾아주기 위해, 우주 전사 버즈 라이트이어가 다시 한 번 하늘을 향해 힘차게 날개를 펼칩니다! 세대를 아우르는 완벽한 감동의 레이스가 지금 스크린 위에 재현됩니다.
+                    </p>
+                </div>
+
+                <div class="flex flex-wrap gap-4 justify-center lg:justify-start">
+                    <div class="bg-white/80 dark:bg-slate-800/80 px-4 py-2.5 rounded-xl border border-sky-100 dark:border-slate-700 shadow-sm text-center transition-colors duration-300">
+                        <span class="text-xs text-slate-400 block">장르</span>
+                        <span class="font-bold text-slate-800 dark:text-slate-200 text-sm">가족 / 모험 / 애니메이션</span>
+                    </div>
+                    <div class="bg-white/80 dark:bg-slate-800/80 px-4 py-2.5 rounded-xl border border-sky-100 dark:border-slate-700 shadow-sm text-center transition-colors duration-300">
+                        <span class="text-xs text-slate-400 block">감상 포인트</span>
+                        <span class="font-bold text-slate-800 dark:text-slate-200 text-sm">장난감들의 우정과 교감</span>
+                    </div>
+                    <div class="bg-white/80 dark:bg-slate-800/80 px-4 py-2.5 rounded-xl border border-sky-100 dark:border-slate-700 shadow-sm text-center transition-colors duration-300">
+                        <span class="text-xs text-slate-400 block">평점</span>
+                        <span class="font-bold text-amber-500 text-sm">★★★★★ 9.8</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 오른쪽: 최신 토이스토리 5 포스터 이미지 적용 -->
+            <div class="lg:col-span-5 flex justify-center">
+                <div class="bg-slate-950 w-72 md:w-80 h-[450px] rounded-3xl p-1.5 shadow-2xl border-4 border-white dark:border-slate-800 relative overflow-hidden transform hover:scale-105 transition-all duration-300">
+                    <!-- 업로드된 리소스를 기본으로 참조하며, 혹시 모를 로딩 장애 발생 시 유저가 지정한 CGV 공식 실물 포스터 링크로 자동 백업 복구합니다 -->
+                    <img src="image_1b8783.png" alt="Toy Story 5 Poster" class="w-full h-full object-cover rounded-[1.25rem] pointer-events-none" onerror="this.onerror=null; this.src='https://cdn.cgv.co.kr/cgvpomsfilm/Movie/Thumbnail/Poster/030001/30001231/30001231_320.jpg';">
+                </div>
+            </div>
+        </div>
+
+        <!-- 스크롤 다운 유도 화살표 -->
+        <div class="absolute bottom-6 flex flex-col items-center gap-1 text-sky-600 dark:text-sky-400 animate-bounce pointer-events-none transition-colors duration-300">
+            <span class="text-xs font-bold uppercase tracking-wider">스크롤해서 비행 게임 즐기기</span>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+        </div>
+    </section>
+
+    <!-- 섹션 3: 버즈 라이트이어 비행 게임 (초록색 들판 배경) -->
+    <section id="game-section" class="min-h-screen bg-slate-900 dark:bg-slate-950 flex flex-col justify-center items-center py-16 px-4 transition-colors duration-300">
+        
+        <!-- 게임 화면 상단 헤더 정보 바 -->
+        <div class="w-full max-w-4xl bg-white dark:bg-slate-950/80 border-2 border-green-500/30 dark:border-green-500/50 rounded-t-3xl px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4 shadow-xl transition-all duration-300">
+            <div class="flex items-center gap-3">
+                <span class="bg-green-500 text-slate-950 font-black text-xs px-3 py-1 rounded-full uppercase">PLAY ZONE</span>
+                <h2 class="text-xl md:text-2xl font-bold text-slate-800 dark:text-white flex items-center gap-2 transition-colors duration-300">
+                    <span>🚀</span> 슬링키 독 피하기 레이스
+                </h2>
+            </div>
+
+            <!-- 실시간 스코어 보드 -->
+            <div class="flex items-center gap-6">
+                <div class="text-right">
+                    <span class="text-[10px] text-slate-500 dark:text-slate-400 block tracking-widest uppercase transition-colors duration-300">SCORE</span>
+                    <span id="scoreDisplay" class="text-2xl md:text-3xl font-extrabold text-green-600 dark:text-yellow-300 transition-colors duration-300">00000</span>
+                </div>
+                <div class="text-right border-l border-slate-200 dark:border-slate-800 pl-6">
+                    <span class="text-[10px] text-slate-500 dark:text-slate-400 block tracking-widest uppercase transition-colors duration-300">BEST</span>
+                    <span id="highScoreDisplay" class="text-2xl md:text-3xl font-extrabold text-sky-600 dark:text-sky-400 transition-colors duration-300">00000</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 중앙 게임 플레이어 영역 및 캔버스 랩퍼 -->
+        <div id="gameContainer" class="relative w-full max-w-4xl aspect-[16/10] bg-slate-950 border-x-4 border-b-4 border-green-500/30 dark:border-green-500/50 rounded-b-3xl overflow-hidden shadow-2xl flex items-center justify-center transition-all duration-300">
+            
+            <!-- HTML5 Canvas -->
+            <canvas id="gameCanvas" class="w-full h-full block"></canvas>
+
+            <!-- 사람 감지 일시정지 오버레이 -->
+            <div id="pauseOverlay" class="hidden absolute inset-0 pause-overlay flex flex-col items-center justify-center text-center p-6 z-20">
+                <div class="bg-red-600 text-white font-extrabold px-6 py-2 rounded-full text-lg mb-4 animate-bounce border-2 border-yellow-300 shadow-lg">
+                    ⚠️ 사람이 방에 들어왔다! ⚠️
+                </div>
+                <h2 class="text-3xl md:text-5xl font-black text-yellow-300 drop-shadow-lg mb-3">
+                    쉿! 움직이지 마!
+                </h2>
+                <p class="text-slate-200 text-sm md:text-lg max-w-md leading-relaxed mb-6">
+                    마우스 움직임이 감지되어 버즈가 장난감인 척 정지했습니다. <br>
+                    <span class="text-green-400 font-bold">마우스 커서를 가만히 두면</span> 1.5초 후 자동으로 다시 비행합니다!
+                </p>
+                <div class="flex items-center gap-2 text-slate-400 text-xs md:text-sm">
+                    <svg class="w-5 h-5 animate-spin text-yellow-400" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>인간의 시선 감시 중...</span>
+                </div>
+            </div>
+
+            <!-- 메뉴 / 오버레이 -->
+            <div id="menuOverlay" class="absolute inset-0 bg-slate-950/90 flex flex-col items-center justify-center text-center p-6 z-20">
+                <div class="mb-6 max-w-md">
+                    <div class="text-yellow-400 text-5xl md:text-7xl mb-3">🚀</div>
+                    <h2 id="menuTitle" class="text-3xl md:text-5xl font-black text-white leading-tight tracking-wider drop-shadow-[0_4px_6px_rgba(72,187,120,0.8)]">
+                        BUZZ FLIGHT
+                    </h2>
+                    <p id="menuDesc" class="text-slate-300 text-sm md:text-base mt-3 leading-relaxed">
+                        화면 위에서 아래로 내려다보는 시점입니다.<br>
+                        다가오는 슬링키(장애물)를 피해 5개의 가이드라인을 넘나들며 비행하세요!
+                    </p>
+                </div>
+
+                <!-- 플레이/Retry 버튼 -->
+                <button id="startBtn" class="bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-400 text-slate-950 font-black text-lg md:text-2xl px-10 py-3.5 rounded-2xl border-b-6 border-amber-700 active:border-b-2 active:translate-y-1 transition-all shadow-lg hover:shadow-yellow-500/20">
+                    비행 시작!
+                </button>
+
+                <!-- 조작 팁 -->
+                <div class="mt-8 bg-slate-900 border border-slate-800 rounded-xl px-5 py-3.5 text-left text-xs md:text-sm text-slate-400 max-w-sm w-full">
+                    <div class="font-bold text-slate-200 mb-2 flex items-center gap-1.5">
+                        <span>🎮</span> 조작법 및 규칙
+                    </div>
+                    <ul class="space-y-1.5 list-disc pl-4 text-slate-300">
+                        <li><b>키보드 방향키(←, ↑, ↓, →)</b>로 버즈 조작</li>
+                        <li><b>선명한 흰색 실선</b>으로 가이드라인 차선이 그려집니다.</li>
+                        <li><b>마우스 감지 기능</b>: 이 게임 구역 내에서 마우스를 흔들면 일시정지 상태가 됩니다!</li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 하단 조작 안내 안내판 -->
+        <p class="text-center text-slate-500 text-xs mt-4">
+            ※ 원페이지 포트폴리오 웹사이트 데모 - "무한한 공간 저 너머로!"
+        </p>
+
+    </section>
+
+    <!-- 오디오 재생 및 게임 로직 JS -->
+    <script>
+        // --- 1. 글로벌 셀렉터 및 변수 정의 ---
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const gameContainer = document.getElementById('gameContainer');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const highScoreDisplay = document.getElementById('highScoreDisplay');
+        const pauseOverlay = document.getElementById('pauseOverlay');
+        const menuOverlay = document.getElementById('menuOverlay');
+        const menuTitle = document.getElementById('menuTitle');
+        const menuDesc = document.getElementById('menuDesc');
+        const startBtn = document.getElementById('startBtn');
+        const goGameBtn = document.getElementById('goGameBtn');
+
+        let game = {
+            state: 'MENU', // 'MENU', 'PLAYING', 'PAUSED', 'GAMEOVER'
+            score: 0,
+            highScore: 0,
+            laneCount: 5,
+            lanesY: [], // 5개 레인의 Y축 중심 좌표 저장
+            speedMultiplier: 1.0,
+            spawnTimer: 0,
+            spawnInterval: 1250, // 장애물 생성 주기 (ms)
+            lastTime: 0
+        };
+
+        // 버즈 라이트이어 탑다운 데이터
+        let player = {
+            lane: 2,         // 현재 레인 (0 ~ 4)
+            targetY: 0,      // 보간 목표 Y
+            x: 120,          // X 좌표 (고정 후 이동 느낌)
+            y: 0,            // 실제 그리는 Y 좌표
+            targetX: 120,    // 좌우 이동 목표 X
+            width: 75,
+            height: 70,
+            speed: 12,       // 스무딩 강도
+            wingSpurt: 0
+        };
+
+        // 장애물(슬링키) 배열
+        let obstacles = [];
+
+        // 사람 시선 감지 (마우스 일시정지) 타이머
+        let mouseTimer = null;
+        let lastMouseX = 0;
+        let lastMouseY = 0;
+
+        // --- 2. 오디오 합성엔진 ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playSound(type) {
+            if (!audioCtx) return;
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            const now = audioCtx.currentTime;
+
+            if (type === 'move') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(200, now);
+                osc.frequency.exponentialRampToValueAtTime(450, now + 0.15);
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                osc.start(now);
+                osc.stop(now + 0.15);
+            } else if (type === 'dodge') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, now);
+                osc.frequency.setValueAtTime(659.25, now + 0.08);
+                osc.frequency.setValueAtTime(783.99, now + 0.16);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.35);
+            } else if (type === 'gameover') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(300, now);
+                osc.frequency.linearRampToValueAtTime(60, now + 0.8);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.8);
+                osc.start(now);
+                osc.stop(now + 0.85);
+            } else if (type === 'start') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.exponentialRampToValueAtTime(800, now + 0.4);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                osc.start(now);
+                osc.stop(now + 0.45);
+            }
+        }
+
+        // --- 3. 반응형 캔버스 사이즈 조절 ---
+        function resizeCanvas() {
+            const rect = gameContainer.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+            
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            
+            ctx.scale(dpr, dpr);
+            canvas.logicalWidth = rect.width;
+            canvas.logicalHeight = rect.height;
+
+            // 5개 라인의 위치를 계산
+            calculateLanes();
+
+            if (game.state === 'PLAYING' || game.state === 'PAUSED') {
+                player.targetY = game.lanesY[player.lane];
+            }
+        }
+
+        function calculateLanes() {
+            const laneHeight = canvas.logicalHeight / game.laneCount;
+            game.lanesY = [];
+            for (let i = 0; i < game.laneCount; i++) {
+                game.lanesY.push((i * laneHeight) + (laneHeight / 2));
+            }
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+
+        // --- 4. 마우스 움직임 감지 (사람 등장!) 일시정지 기믹 개선 ---
+        // 사용자가 영화를 편하게 읽을 수 있게 "게임 컨테이너 위에 마우스가 올라가 있을 때만" 감지합니다.
+        function triggerHumanWatch() {
+            if (game.state !== 'PLAYING') return;
+
+            game.state = 'PAUSED';
+            pauseOverlay.classList.remove('hidden');
+
+            if (mouseTimer) clearTimeout(mouseTimer);
+
+            // 마우스를 1.5초간 움직이지 않으면 다시 나간 것으로 봄
+            mouseTimer = setTimeout(() => {
+                if (game.state === 'PAUSED') {
+                    game.state = 'PLAYING';
+                    pauseOverlay.classList.add('hidden');
+                    game.lastTime = performance.now(); // 시간 리셋
+                }
+            }, 1500);
+        }
+
+        // 게임 구역(gameContainer) 내부에서만 마우스 감지 작동!
+        gameContainer.addEventListener('mousemove', (e) => {
+            const rect = gameContainer.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+
+            const movementX = Math.abs(mouseX - lastMouseX);
+            const movementY = Math.abs(mouseY - lastMouseY);
+
+            lastMouseX = mouseX;
+            lastMouseY = mouseY;
+
+            if (movementX > 2 || movementY > 2) {
+                triggerHumanWatch();
+            }
+        });
+
+        // --- 5. 키보드 제어 ---
+        window.addEventListener('keydown', (e) => {
+            if (game.state !== 'PLAYING') return;
+
+            let moved = false;
+
+            switch(e.key) {
+                case 'ArrowUp':
+                case 'Up':
+                    if (player.lane > 0) {
+                        player.lane--;
+                        moved = true;
+                    }
+                    e.preventDefault();
+                    break;
+                case 'ArrowDown':
+                case 'Down':
+                    if (player.lane < game.laneCount - 1) {
+                        player.lane++;
+                        moved = true;
+                    }
+                    e.preventDefault();
+                    break;
+                case 'ArrowLeft':
+                case 'Left':
+                    player.targetX = Math.max(50, player.targetX - 80);
+                    moved = true;
+                    e.preventDefault();
+                    break;
+                case 'ArrowRight':
+                case 'Right':
+                    player.targetX = Math.min(canvas.logicalWidth * 0.6, player.targetX + 80);
+                    moved = true;
+                    e.preventDefault();
+                    break;
+            }
+
+            if (moved) {
+                player.targetY = game.lanesY[player.lane];
+                playSound('move');
+            }
+        });
+
+        // --- 6. 드로잉 모듈 ---
+
+        // 버즈 라이트이어 그리기 (탑다운 뷰)
+        function drawBuzz(ctx, p) {
+            ctx.save();
+            ctx.translate(p.x, p.y);
+
+            // 제트팩 부스터 연기/불꽃 애니메이션
+            p.wingSpurt = (p.wingSpurt + 0.25) % (Math.PI * 2);
+            const flameLen = 15 + Math.sin(p.wingSpurt) * 6;
+            
+            // 날개 부스터 불꽃
+            const wingYOffsets = [-28, 28];
+            wingYOffsets.forEach(yOffset => {
+                const grad = ctx.createLinearGradient(-35, yOffset, -35 - flameLen, yOffset);
+                grad.addColorStop(0, '#ffeb3b');
+                grad.addColorStop(0.4, '#ff9800');
+                grad.addColorStop(1, 'rgba(244, 67, 54, 0)');
+                ctx.fillStyle = grad;
+                ctx.beginPath();
+                ctx.moveTo(-25, yOffset - 5);
+                ctx.lineTo(-35 - flameLen, yOffset);
+                ctx.lineTo(-25, yOffset + 5);
+                ctx.fill();
+            });
+
+            // 1. 펼친 제트팩 날개 (보라색 + 초록 테두리)
+            ctx.fillStyle = '#9c27b0';
+            ctx.strokeStyle = '#4caf50';
+            ctx.lineWidth = 3;
+
+            // 왼쪽
+            ctx.beginPath();
+            ctx.moveTo(-10, -10);
+            ctx.lineTo(-30, -32);
+            ctx.lineTo(-5, -35);
+            ctx.lineTo(15, -15);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            // 오른쪽
+            ctx.beginPath();
+            ctx.moveTo(-10, 10);
+            ctx.lineTo(-30, 32);
+            ctx.lineTo(-5, 35);
+            ctx.lineTo(15, 15);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            // 지시등
+            ctx.fillStyle = '#f44336';
+            ctx.beginPath();
+            ctx.arc(-30, -32, 4, 0, Math.PI*2);
+            ctx.fill();
+
+            ctx.fillStyle = '#00e676';
+            ctx.beginPath();
+            ctx.arc(-30, 32, 4, 0, Math.PI*2);
+            ctx.fill();
+
+            // 2. 우주복 몸체 등판
+            ctx.fillStyle = '#e0e0e0';
+            ctx.strokeStyle = '#757575';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(-5, 0, 16, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            // 제트팩 프레임
+            ctx.fillStyle = '#7b1fa2';
+            ctx.fillRect(-22, -18, 14, 36);
+            ctx.strokeRect(-22, -18, 14, 36);
+
+            // 헬멧 구체 내부
+            ctx.fillStyle = '#673ab7';
+            ctx.beginPath();
+            ctx.arc(10, 0, 10, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 헬멧 유리 반사
+            const glassGrad = ctx.createRadialGradient(13, -5, 2, 10, 0, 14);
+            glassGrad.addColorStop(0, 'rgba(255, 255, 255, 0.7)');
+            glassGrad.addColorStop(0.3, 'rgba(129, 212, 250, 0.4)');
+            glassGrad.addColorStop(1, 'rgba(3, 169, 244, 0.15)');
+            ctx.fillStyle = glassGrad;
+            ctx.beginPath();
+            ctx.arc(10, 0, 14, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+            ctx.stroke();
+
+            // 초록 어깨 패드
+            ctx.fillStyle = '#4caf50';
+            ctx.strokeStyle = '#2e7d32';
+            ctx.beginPath();
+            ctx.ellipse(3, -19, 7, 9, Math.PI / 4, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.ellipse(3, 19, 7, 9, -Math.PI / 4, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            // 팔 그리기
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(8, -25, 10, 6);
+            ctx.fillRect(8, 19, 10, 6);
+
+            ctx.restore();
+        }
+
+        // 장애물(슬링키 독) 그리기 (탑다운 뷰)
+        function drawSlinkyDog(ctx, obs) {
+            ctx.save();
+            ctx.translate(obs.x, obs.y);
+
+            const runCycle = Math.sin(obs.legAnim) * 8;
+
+            // 1. 스프링 바디
+            ctx.strokeStyle = '#8a8a8a';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            for (let i = -15; i <= 15; i += 5) {
+                const bounce = Math.sin(obs.legAnim + i*0.1) * 3;
+                ctx.arc(i, bounce, 12, 0, Math.PI * 2);
+            }
+            ctx.stroke();
+
+            // 2. 갈색 몸통 부품
+            ctx.fillStyle = '#8d6e63';
+            ctx.strokeStyle = '#5d4037';
+            ctx.lineWidth = 2;
+
+            ctx.beginPath();
+            ctx.arc(20, 0, 10, 0, Math.PI * 2); // 가슴
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(-20, 0, 9, 0, Math.PI * 2); // 엉덩이
+            ctx.fill();
+            ctx.stroke();
+
+            // 3. 다리
+            ctx.fillStyle = '#5d4037';
+            ctx.fillRect(-24, -14 + runCycle, 5, 8);
+            ctx.fillRect(-18, 8 - runCycle, 5, 8);
+            ctx.fillRect(16, -14 - runCycle, 5, 8);
+            ctx.fillRect(22, 8 + runCycle, 5, 8);
+
+            // 4. 얼굴 & 귀
+            ctx.fillStyle = '#8d6e63';
+            ctx.beginPath();
+            ctx.ellipse(28, 0, 11, 8, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = '#4e342e';
+            ctx.beginPath();
+            ctx.ellipse(26, -9, 4, 10, -Math.PI / 6, 0, Math.PI * 2); // 왼쪽 귀
+            ctx.ellipse(26, 9, 4, 10, Math.PI / 6, 0, Math.PI * 2);  // 오른쪽 귀
+            ctx.fill();
+
+            // 눈동자
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(32, -3, 2.5, 0, Math.PI * 2);
+            ctx.arc(32, 3, 2.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#000000';
+            ctx.beginPath();
+            ctx.arc(33, -3, 1.2, 0, Math.PI * 2);
+            ctx.arc(33, 3, 1.2, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 코
+            ctx.fillStyle = '#000000';
+            ctx.beginPath();
+            ctx.arc(38, 0, 3, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 꼬리
+            ctx.strokeStyle = '#757575';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(-29, 0);
+            ctx.quadraticCurveTo(-38, -runCycle, -42, -5);
+            ctx.stroke();
+            ctx.fillStyle = '#4e342e';
+            ctx.beginPath();
+            ctx.arc(-42, -5, 3, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        // --- 7. 메인 루프 업데이트 ---
+        function update(deltaTime) {
+            if (game.state !== 'PLAYING') return;
+
+            // 점수 증가 및 속도 증가
+            game.score += (deltaTime / 1000) * 10;
+            scoreDisplay.textContent = String(Math.floor(game.score)).padStart(5, '0');
+
+            game.speedMultiplier = Math.min(2.3, 1.0 + (game.score / 5000));
+
+            // 버즈 스무딩 보간 이동
+            player.y += (player.targetY - player.y) * (player.speed * (deltaTime / 1000));
+            player.x += (player.targetX - player.x) * (player.speed * (deltaTime / 1000));
+
+            // 장애물 스폰 타이머
+            game.spawnTimer += deltaTime;
+            if (game.spawnTimer >= game.spawnInterval / game.speedMultiplier) {
+                spawnObstacle();
+                game.spawnTimer = 0;
+            }
+
+            // 장애물 업데이트 및 충돌 검사
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                const obs = obstacles[i];
+                obs.x -= obs.speed * game.speedMultiplier * (deltaTime / 16);
+                obs.legAnim += 0.22 * game.speedMultiplier;
+
+                // 충돌 판정 (Hitbox)
+                const hitBoxX = player.x - 22;
+                const hitBoxY = player.y - 18;
+                const hitBoxW = 44;
+                const hitBoxH = 36;
+
+                const obsHitX = obs.x - 28;
+                const obsHitY = obs.y - 14;
+                const obsHitW = 56;
+                const obsHitH = 28;
+
+                if (hitBoxX < obsHitX + obsHitW &&
+                    hitBoxX + hitBoxW > obsHitX &&
+                    hitBoxY < obsHitY + obsHitH &&
+                    hitBoxY + hitBoxH > obsHitY) {
+                    gameOver();
+                    return;
+                }
+
+                // 회피 성공
+                if (obs.x < -80) {
+                    obstacles.splice(i, 1);
+                    game.score += 100;
+                    playSound('dodge');
+                }
+            }
+        }
+
+        function spawnObstacle() {
+            const randomLane = Math.floor(Math.random() * game.laneCount);
+            const targetY = game.lanesY[randomLane];
+
+            obstacles.push({
+                lane: randomLane,
+                x: canvas.logicalWidth + 60,
+                y: targetY,
+                speed: 4.8 + Math.random() * 2.5,
+                legAnim: Math.random() * 10,
+                width: 60,
+                height: 40
+            });
+        }
+
+        // 전체 화면 그리기 (명확한 흰색 라인 처리)
+        function draw() {
+            ctx.clearRect(0, 0, canvas.logicalWidth, canvas.logicalHeight);
+
+            const laneHeight = canvas.logicalHeight / game.laneCount;
+
+            // 1. 줄 구분을 위한 초선 가이드 배경 및 흰색 선 그리기
+            for (let i = 0; i < game.laneCount; i++) {
+                // 짝수 번째 레인 뒤에는 살짝 불투명한 하이라이트를 주어 공간을 가시화함
+                if (i % 2 === 0) {
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.04)';
+                    ctx.fillRect(0, i * laneHeight, canvas.logicalWidth, laneHeight);
+                }
+
+                // 각 줄 좌측 끝에 심플한 차선 번호 마크 그리기 (공간 가시성 향상)
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.font = 'bold 12px "Nanum Gothic"';
+                ctx.fillText(`LANE ${i + 1}`, 15, i * laneHeight + 20);
+            }
+
+            // 줄 사이에 명확한 흰색 선을 선명하고 또렷하게 표시
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)'; // 한눈에 띄는 선명한 흰색 라인
+            ctx.lineWidth = 3;                             // 두께감 있는 선
+            ctx.setLineDash([15, 10]);                     // 점선 간격 최적화
+            
+            for (let i = 1; i < game.laneCount; i++) {
+                ctx.beginPath();
+                ctx.moveTo(0, i * laneHeight);
+                ctx.lineTo(canvas.logicalWidth, i * laneHeight);
+                ctx.stroke();
+            }
+            ctx.setLineDash([]); // 라인 세팅 초기화
+
+            // 2. 들판 잔디 풀밭 데코레이션
+            ctx.fillStyle = 'rgba(255,255,255,0.08)';
+            for (let i = 0; i < 6; i++) {
+                const gx = (canvas.logicalWidth / 5 * i + 80) % canvas.logicalWidth;
+                const gy = (350 * i + 70) % canvas.logicalHeight;
+                ctx.fillRect(gx, gy, 4, 12);
+                ctx.fillRect(gx - 4, gy + 3, 4, 9);
+                ctx.fillRect(gx + 4, gy + 5, 4, 7);
+            }
+
+            // 3. 현재 버즈의 활성화된 라인을 살짝 표시해 주는 유도 광선 (옵션 효과)
+            ctx.fillStyle = 'rgba(129, 230, 217, 0.08)'; // 하늘빛 살짝 비침
+            ctx.fillRect(0, player.lane * laneHeight, canvas.logicalWidth, laneHeight);
+
+            // 4. 장애물 렌더링
+            obstacles.forEach(obs => {
+                drawSlinkyDog(ctx, obs);
+            });
+
+            // 5. 버즈 렌더링
+            drawBuzz(ctx, player);
+        }
+
+        // 엔진 작동 루프
+        function loop(timestamp) {
+            if (!game.lastTime) game.lastTime = timestamp;
+            let deltaTime = timestamp - game.lastTime;
+            if (deltaTime > 100) deltaTime = 100;
+            game.lastTime = timestamp;
+
+            if (game.state === 'PLAYING') {
+                update(deltaTime);
+            }
+            
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        // --- 8. 컨트롤 매핑 및 세팅 ---
+        function startGame() {
+            game.score = 0;
+            game.speedMultiplier = 1.0;
+            game.spawnTimer = 0;
+            obstacles = [];
+            
+            player.lane = 2;
+            player.targetY = game.lanesY[player.lane];
+            player.y = player.targetY;
+            player.x = 120;
+            player.targetX = 120;
+
+            game.state = 'PLAYING';
+            menuOverlay.classList.add('hidden');
+            pauseOverlay.classList.add('hidden');
+            
+            scoreDisplay.textContent = '00000';
+            game.lastTime = performance.now();
+            
+            playSound('start');
+        }
+
+        function gameOver() {
+            game.state = 'GAMEOVER';
+            playSound('gameover');
+
+            if (game.score > game.highScore) {
+                game.highScore = Math.floor(game.score);
+                highScoreDisplay.textContent = String(game.highScore).padStart(5, '0');
+            }
+
+            menuTitle.innerHTML = "GAME OVER";
+            menuDesc.innerHTML = `<span class="text-yellow-400 font-extrabold text-lg">최종 기록: ${Math.floor(game.score)}점</span><br>버즈가 슬링키를 피하지 못해 사람이 본 것처럼 정지했습니다!`;
+            startBtn.textContent = "다시 비행하기 (Retry)";
+            
+            menuOverlay.classList.remove('hidden');
+        }
+
+        startBtn.addEventListener('click', () => {
+            startGame();
+        });
+
+        // "게임하러 가기" 스무스 스크롤 작동
+        goGameBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('game-section').scrollIntoView({ behavior: 'smooth' });
+        });
+
+        // --- 9. 스마트 다크 모드 컨트롤 로직 ---
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        const sunIcon = document.getElementById('sunIcon');
+        const moonIcon = document.getElementById('moonIcon');
+
+        // 테마 상태 갱신 함수
+        function updateTheme() {
+            if (document.documentElement.classList.contains('dark')) {
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            } else {
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            }
+        }
+
+        // 기기 설정 혹은 이전에 설정한 스토리지 정보 연동
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+        updateTheme();
+
+        // 토글 버튼 클릭 리스너
+        themeToggleBtn.addEventListener('click', () => {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+            updateTheme();
+        });
+
+        // 초기 스타트
+        window.onload = function() {
+            resizeCanvas();
+            draw();
+            requestAnimationFrame(loop);
+        };
+    </script>
+</body>
+</html>
