@@ -60,6 +60,48 @@
             background: rgba(15, 23, 42, 0.85);
             backdrop-filter: blur(6px);
         }
+
+        /* --- [수정사항 1] 깜빡이는 타이핑 커서 애니메이션 --- */
+        .typing-cursor {
+            display: inline-block;
+            width: 3px;
+            height: 0.95em;
+            background-color: currentColor;
+            margin-left: 4px;
+            vertical-align: middle;
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink {
+            from, to { background-color: transparent; }
+            50% { background-color: currentColor; }
+        }
+
+        /* --- [수정사항 2] 다크모드용 은은하게 반짝이며 흘러가는 별 파티클 배경 --- */
+        .stars-overlay {
+            position: absolute;
+            inset: 0;
+            background-image: 
+                radial-gradient(1.5px 1.5px at 20px 30px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 40px 70px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 50px 160px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 90px 110px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(1.5px 1.5px at 130px 210px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 160px 120px, #ffffff, rgba(0,0,0,0));
+            background-size: 200px 200px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.6s ease;
+            mix-blend-mode: screen;
+            animation: twinkleBackground 15s infinite linear;
+        }
+        /* 다크모드 클래스가 활성화되었을 때만 은은하게 페이드인 */
+        .dark .stars-overlay {
+            opacity: 0.45;
+        }
+        @keyframes twinkleBackground {
+            0% { background-position: 0px 0px; }
+            100% { background-position: -200px -200px; }
+        }
     </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 overflow-x-hidden transition-colors duration-300">
@@ -90,6 +132,8 @@
 
     <!-- 섹션 1: 나의 취미 소개 (라이트/다크에 따라 변하는 모던 시네마틱 스타일) -->
     <section id="hobby-section" class="clean-hobby-font min-h-screen pt-28 pb-16 px-6 flex flex-col justify-center items-center bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-950 dark:via-slate-900 dark:to-slate-900 relative transition-all duration-300">
+        <!-- 다크모드 시 반짝이는 별 레이어 -->
+        <div class="stars-overlay"></div>
         <!-- 은은한 무대 조명 백라이트 효과 -->
         <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[250px] bg-sky-500/10 rounded-full blur-[120px] pointer-events-none"></div>
 
@@ -100,11 +144,12 @@
 
             <!-- 핵심 인트로 메시지 -->
             <div class="space-y-6">
-                <h1 class="text-3xl md:text-5xl font-extrabold text-slate-950 dark:text-white leading-tight tracking-tight drop-shadow-md transition-colors duration-300">
-                    저의 취미는 <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-500 to-indigo-500 dark:from-sky-400 dark:to-indigo-400">영화 감상</span> 입니다.
+                <!-- [수정] 타이핑 효과가 동적으로 나타날 헤드라인 타겟 (높이 고정으로 레이아웃 흔들림 방지) -->
+                <h1 id="typingHeading" class="text-3xl md:text-5xl font-extrabold text-slate-950 dark:text-white leading-tight tracking-tight drop-shadow-md transition-colors duration-300 min-h-[72px] md:min-h-[100px]">
+                    <span class="typing-cursor"></span>
                 </h1>
-                <p class="text-base md:text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto font-normal leading-relaxed tracking-wide transition-colors duration-300">
-                    영화관에서 하나의 스크린에 몰두하는 경험을 좋아하게 되어 영화를 좋아하게 되었습니다.
+                <!-- [수정] 두 번째 문장도 타이핑 효과 적용 및 레이아웃 덜컹거림 방지 높이 고정 -->
+                <p id="typingSubHeading" class="text-base md:text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto font-normal leading-relaxed tracking-wide transition-colors duration-300 min-h-[48px] md:min-h-[64px]">
                 </p>
             </div>
 
@@ -140,6 +185,8 @@
 
     <!-- 섹션 2: 토이스토리 5 소개 (하늘색/밤하늘색 가변 배경 - 본문 및 제목에 주아체로 친근함 강조) -->
     <section id="intro-section" class="sky-bg bg-gradient-to-b from-sky-200 to-sky-50 dark:from-slate-950 dark:to-slate-900 min-h-screen pb-16 px-6 flex flex-col justify-center items-center relative border-t border-sky-100 dark:border-slate-800 transition-colors duration-300">
+        <!-- 다크모드 시 반짝이는 별 레이어 -->
+        <div class="stars-overlay"></div>
         <!-- 구름 데코레이션 배경 생성 (테마별 스타일) -->
         <div class="cloud w-44 h-16 top-28 left-[-100px] bg-white/60 dark:bg-indigo-900/20 dark:backdrop-blur-sm" style="animation-delay: 0s; opacity: 0.7;"></div>
         <div class="cloud w-64 h-24 top-64 left-[-200px] bg-white/60 dark:bg-indigo-900/20 dark:backdrop-blur-sm" style="animation-delay: 8s; opacity: 0.5;"></div>
@@ -338,6 +385,9 @@
         // 장애물(슬링키) 배열
         let obstacles = [];
 
+        // --- [수정사항 2] 슬링키독 레이스 배경에 반짝이는 별 파티클 데이터 배열 ---
+        let bgStars = [];
+
         // 사람 시선 감지 (마우스 일시정지) 타이머
         let mouseTimer = null;
         let lastMouseX = 0;
@@ -393,6 +443,25 @@
             }
         }
 
+        // --- [수정사항 2] 은은한 별 파티클 생성 시스템 ---
+        function initBgStars() {
+            bgStars = [];
+            const starCount = 35; // 화면 크기에 적절한 은은한 별 개수
+            const width = canvas.logicalWidth || 800;
+            const height = canvas.logicalHeight || 500;
+            for (let i = 0; i < starCount; i++) {
+                bgStars.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    size: 1 + Math.random() * 2,
+                    opacity: 0.1 + Math.random() * 0.75, // 불규칙한 초기 투명도
+                    speed: 0.01 + Math.random() * 0.04,   // 깜빡이는 속도
+                    phase: Math.random() * Math.PI * 2,    // 사인파 위상 랜덤화
+                    flowSpeed: 0.2 + Math.random() * 0.5 // 우주감이 나도록 슬며시 뒤로 흘러가는 속도
+                });
+            }
+        }
+
         // --- 3. 반응형 캔버스 사이즈 조절 ---
         function resizeCanvas() {
             const rect = gameContainer.getBoundingClientRect();
@@ -407,6 +476,9 @@
 
             // 5개 라인의 위치를 계산
             calculateLanes();
+
+            // 별 파티클 초기 생성/재조정
+            initBgStars();
 
             if (game.state === 'PLAYING' || game.state === 'PAUSED') {
                 player.targetY = game.lanesY[player.lane];
@@ -717,6 +789,19 @@
             player.y += (player.targetY - player.y) * (player.speed * (deltaTime / 1000));
             player.x += (player.targetX - player.x) * (player.speed * (deltaTime / 1000));
 
+            // [수정사항 2] 은은한 별빛 파티클 흐름 및 무한루프 처리
+            bgStars.forEach(star => {
+                star.phase += star.speed * (deltaTime / 16);
+                // 사인파를 적용하여 부드럽게 반짝임(Twinkle) 표현
+                star.currentOpacity = star.opacity * (0.25 + 0.75 * Math.abs(Math.sin(star.phase)));
+                // 우주선 비행과 연동하여 별들을 왼쪽으로 흘려줌
+                star.x -= star.flowSpeed * game.speedMultiplier * (deltaTime / 16);
+                if (star.x < -10) {
+                    star.x = canvas.logicalWidth + 10;
+                    star.y = Math.random() * canvas.logicalHeight;
+                }
+            });
+
             // 장애물 스폰 타이머
             game.spawnTimer += deltaTime;
             if (game.spawnTimer >= game.spawnInterval / game.speedMultiplier) {
@@ -776,6 +861,14 @@
         // 전체 화면 그리기 (명확한 흰색 라인 처리)
         function draw() {
             ctx.clearRect(0, 0, canvas.logicalWidth, canvas.logicalHeight);
+
+            // [수정사항 2] 게임 판에 은은히 깜빡이는 별빛 파티클 렌더링 (가장 아래 레이어)
+            bgStars.forEach(star => {
+                ctx.fillStyle = `rgba(255, 255, 255, ${star.currentOpacity})`;
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
 
             const laneHeight = canvas.logicalHeight / game.laneCount;
 
@@ -864,6 +957,9 @@
             scoreDisplay.textContent = '00000';
             game.lastTime = performance.now();
             
+            // 파티클 별 재생성
+            initBgStars();
+
             playSound('start');
         }
 
@@ -934,7 +1030,113 @@
             resizeCanvas();
             draw();
             requestAnimationFrame(loop);
+            
+            initTypewriter();
         };
+
+        // --- 10. 동적 타이핑 효과 및 스크롤 감지 복귀 트리거 시스템 ---
+        const typingTarget1 = document.getElementById('typingHeading');
+        const typingTarget2 = document.getElementById('typingSubHeading');
+        
+        const textParts1 = [
+            { text: "저의 취미는 ", styled: false },
+            { text: "영화 감상", styled: true },
+            { text: " 입니다" }
+        ];
+        const textParts2 = [
+            { text: "영화관에서 하나의 스크린에 몰두하는 경험을 좋아하게 되어 영화를 좋아하게 되었습니다.", styled: false }
+        ];
+        
+        let typingTimeout1 = null;
+        let typingTimeout2 = null;
+        let isTyping = false;
+
+        function runTypingAnimation() {
+            if (isTyping) return;
+            isTyping = true;
+            
+            // 기존에 남아있을 수 있는 잔여 타이머 일괄 청소
+            if (typingTimeout1) clearTimeout(typingTimeout1);
+            if (typingTimeout2) clearTimeout(typingTimeout2);
+            
+            // 화면 초기값 원상복구
+            typingTarget1.innerHTML = `<span class="typing-cursor"></span>`;
+            typingTarget2.innerHTML = ``;
+            
+            let totalLength1 = textParts1.reduce((acc, part) => acc + part.text.length, 0);
+            let idx1 = 0;
+            
+            function typeFirst() {
+                if (idx1 <= totalLength1) {
+                    let renderedHTML = "";
+                    let charCount = 0;
+                    
+                    for (let part of textParts1) {
+                        if (charCount >= idx1) break;
+                        
+                        let remainingChars = idx1 - charCount;
+                        let take = Math.min(part.text.length, remainingChars);
+                        let substring = part.text.substring(0, take);
+                        
+                        if (part.styled) {
+                            renderedHTML += `<span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-500 to-indigo-500 dark:from-sky-400 dark:to-indigo-400">${substring}</span>`;
+                        } else {
+                            renderedHTML += substring;
+                        }
+                        
+                        charCount += take;
+                    }
+                    
+                    renderedHTML += `<span class="typing-cursor"></span>`;
+                    typingTarget1.innerHTML = renderedHTML;
+                    idx1++;
+                    typingTimeout1 = setTimeout(typeFirst, 65); // 속도 최적화 (65ms)
+                } else {
+                    // 첫 문장 타이핑 완료 후 커서를 일시 제거하고 다음 문장으로 바톤 터치
+                    let finalHTML1 = "";
+                    for (let part of textParts1) {
+                        if (part.styled) {
+                            finalHTML1 += `<span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-500 to-indigo-500 dark:from-sky-400 dark:to-indigo-400">${part.text}</span>`;
+                        } else {
+                            finalHTML1 += part.text;
+                        }
+                    }
+                    typingTarget1.innerHTML = finalHTML1;
+                    
+                    let totalLength2 = textParts2[0].text.length;
+                    let idx2 = 0;
+                    
+                    function typeSecond() {
+                        if (idx2 <= totalLength2) {
+                            let substring = textParts2[0].text.substring(0, idx2);
+                            typingTarget2.innerHTML = substring + `<span class="typing-cursor"></span>`;
+                            idx2++;
+                            typingTimeout2 = setTimeout(typeSecond, 40); // 서브 문장은 살짝 더 빠른 템포로 재생
+                        } else {
+                            isTyping = false;
+                        }
+                    }
+                    typeSecond();
+                }
+            }
+            typeFirst();
+        }
+
+        function initTypewriter() {
+            // 관찰 대상을 설정하여 화면에 노출될 때마다 타이핑 동작
+            const hobbyObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        typingTarget1.innerHTML = `<span class="typing-cursor"></span>`;
+                        typingTarget2.innerHTML = ``;
+                        isTyping = false;
+                        runTypingAnimation();
+                    }
+                });
+            }, { threshold: 0.15 }); // 섹션이 15% 이상 노출되었을 때 작동
+
+            hobbyObserver.observe(document.getElementById('hobby-section'));
+        }
     </script>
 </body>
 </html>
