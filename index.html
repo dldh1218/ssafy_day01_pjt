@@ -44,14 +44,8 @@
             100% { transform: translateX(calc(100vw + 150px)); }
         }
 
-        /* 게임 캔버스 배경 (풀밭 텍스처) */
+        /* [수정] 게임 캔버스 배경을 CSS가 아닌 JS 동적 드로잉으로 이관하여 그림자만 유지 */
         #gameCanvas {
-            background-color: #38a169; /* 조금 더 짙은 잔디색 */
-            background-image: 
-                radial-gradient(#48bb78 15%, transparent 20%),
-                radial-gradient(#2f855a 15%, transparent 20%);
-            background-size: 50px 50px;
-            background-position: 0 0, 25px 25px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.4);
         }
 
@@ -61,7 +55,7 @@
             backdrop-filter: blur(6px);
         }
 
-        /* --- [수정사항 1] 깜빡이는 타이핑 커서 애니메이션 --- */
+        /* --- 깜빡이는 타이핑 커서 애니메이션 --- */
         .typing-cursor {
             display: inline-block;
             width: 3px;
@@ -76,31 +70,31 @@
             50% { background-color: currentColor; }
         }
 
-        /* --- [수정사항 2] 다크모드용 은은하게 반짝이며 흘러가는 별 파티클 배경 --- */
+        /* --- 다크모드용 은은하게 반짝이며 흘러가는 별 파티클 배경 --- */
         .stars-overlay {
             position: absolute;
             inset: 0;
             background-image: 
                 radial-gradient(1.5px 1.5px at 20px 30px, #ffffff, rgba(0,0,0,0)),
                 radial-gradient(2px 2px at 40px 70px, #ffffff, rgba(0,0,0,0)),
-                radial-gradient(1px 1px at 50px 160px, #ffffff, rgba(0,0,0,0)),
-                radial-gradient(2px 2px at 90px 110px, #ffffff, rgba(0,0,0,0)),
-                radial-gradient(1.5px 1.5px at 130px 210px, #ffffff, rgba(0,0,0,0)),
-                radial-gradient(2px 2px at 160px 120px, #ffffff, rgba(0,0,0,0));
-            background-size: 200px 200px;
+                radial-gradient(1.5px 1.5px at 50px 160px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2.5px 2.5px at 90px 110px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 130px 210px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(3px 3px at 160px 120px, #ffffff, rgba(0,0,0,0));
+            background-size: 150px 150px; /* 별의 분포를 더 촘촘히 묘사 */
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.6s ease;
             mix-blend-mode: screen;
-            animation: twinkleBackground 15s infinite linear;
+            animation: twinkleBackground 12s infinite linear; /* 약간 더 빠른 호흡으로 역동성 강화 */
         }
-        /* 다크모드 클래스가 활성화되었을 때만 은은하게 페이드인 */
+        /* 다크모드 클래스가 활성화되었을 때 훨씬 더 또렷하고 깊이 있는 우주감 선사 */
         .dark .stars-overlay {
-            opacity: 0.45;
+            opacity: 0.85; /* 시각적 선명함 제공 */
         }
         @keyframes twinkleBackground {
             0% { background-position: 0px 0px; }
-            100% { background-position: -200px -200px; }
+            100% { background-position: -150px -150px; }
         }
     </style>
 </head>
@@ -144,11 +138,11 @@
 
             <!-- 핵심 인트로 메시지 -->
             <div class="space-y-6">
-                <!-- [수정] 타이핑 효과가 동적으로 나타날 헤드라인 타겟 (높이 고정으로 레이아웃 흔들림 방지) -->
+                <!-- 타이팅 효과가 동적으로 나타날 헤드라인 타겟 (높이 고정으로 레이아웃 흔들림 방지) -->
                 <h1 id="typingHeading" class="text-3xl md:text-5xl font-extrabold text-slate-950 dark:text-white leading-tight tracking-tight drop-shadow-md transition-colors duration-300 min-h-[72px] md:min-h-[100px]">
                     <span class="typing-cursor"></span>
                 </h1>
-                <!-- [수정] 두 번째 문장도 타이핑 효과 적용 및 레이아웃 덜컹거림 방지 높이 고정 -->
+                <!-- 두 번째 문장도 타이핑 효과 적용 및 레이아웃 덜컹거림 방지 높이 고정 -->
                 <p id="typingSubHeading" class="text-base md:text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto font-normal leading-relaxed tracking-wide transition-colors duration-300 min-h-[48px] md:min-h-[64px]">
                 </p>
             </div>
@@ -184,7 +178,8 @@
     </section>
 
     <!-- 섹션 2: 토이스토리 5 소개 (하늘색/밤하늘색 가변 배경 - 본문 및 제목에 주아체로 친근함 강조) -->
-    <section id="intro-section" class="sky-bg bg-gradient-to-b from-sky-200 to-sky-50 dark:from-slate-950 dark:to-slate-900 min-h-screen pb-16 px-6 flex flex-col justify-center items-center relative border-t border-sky-100 dark:border-slate-800 transition-colors duration-300">
+    <!-- [수정] 아래 화살표와 겹치지 않도록 하단 패딩을 pb-16에서 pb-28로 대폭 확장하여 물리적 빈 공간을 보증 -->
+    <section id="intro-section" class="sky-bg bg-gradient-to-b from-sky-200 to-sky-50 dark:from-slate-950 dark:to-slate-900 min-h-screen pb-28 px-6 flex flex-col justify-center items-center relative border-t border-sky-100 dark:border-slate-800 transition-colors duration-300">
         <!-- 다크모드 시 반짝이는 별 레이어 -->
         <div class="stars-overlay"></div>
         <!-- 구름 데코레이션 배경 생성 (테마별 스타일) -->
@@ -244,17 +239,20 @@
         </div>
 
         <!-- 스크롤 다운 유도 화살표 -->
-        <div class="absolute bottom-6 flex flex-col items-center gap-1 text-sky-600 dark:text-sky-400 animate-bounce pointer-events-none transition-colors duration-300">
+        <div class="absolute bottom-6 flex flex-col items-center gap-1 text-sky-600 animate-bounce pointer-events-none transition-colors duration-300">
             <span class="text-xs font-bold uppercase tracking-wider">스크롤해서 비행 게임 즐기기</span>
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
         </div>
     </section>
 
-    <!-- 섹션 3: 버즈 라이트이어 비행 게임 (초록색 들판 배경) -->
-    <section id="game-section" class="min-h-screen bg-slate-900 dark:bg-slate-950 flex flex-col justify-center items-center py-16 px-4 transition-colors duration-300">
+    <!-- 섹션 3: 버즈 라이트이어 비행 게임 (다크모드 지원 및 은은한 별 파티클 레이어 추가) -->
+    <!-- [수정] bg-slate-100 클래스를 추가하여 라이트 모드일 때 전체 배경이 밝고 부드럽게 연출되도록 개선 -->
+    <section id="game-section" class="min-h-screen bg-slate-100 dark:bg-slate-950 flex flex-col justify-center items-center py-16 px-4 transition-colors duration-300 relative">
+        <!-- 다크모드 시 반짝이는 별 레이어로 풍부한 야간 공간감 제공 -->
+        <div class="stars-overlay"></div>
         
         <!-- 게임 화면 상단 헤더 정보 바 -->
-        <div class="w-full max-w-4xl bg-white dark:bg-slate-950/80 border-2 border-green-500/30 dark:border-green-500/50 rounded-t-3xl px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4 shadow-xl transition-all duration-300">
+        <div class="w-full max-w-4xl bg-white dark:bg-slate-950/80 border-2 border-green-500/30 dark:border-green-500/50 rounded-t-3xl px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4 shadow-xl transition-all duration-300 relative z-10">
             <div class="flex items-center gap-3">
                 <span class="bg-green-500 text-slate-950 font-black text-xs px-3 py-1 rounded-full uppercase">PLAY ZONE</span>
                 <h2 class="text-xl md:text-2xl font-bold text-slate-800 dark:text-white flex items-center gap-2 transition-colors duration-300">
@@ -276,7 +274,7 @@
         </div>
 
         <!-- 중앙 게임 플레이어 영역 및 캔버스 랩퍼 -->
-        <div id="gameContainer" class="relative w-full max-w-4xl aspect-[16/10] bg-slate-950 border-x-4 border-b-4 border-green-500/30 dark:border-green-500/50 rounded-b-3xl overflow-hidden shadow-2xl flex items-center justify-center transition-all duration-300">
+        <div id="gameContainer" class="relative w-full max-w-4xl aspect-[16/10] bg-slate-950 border-x-4 border-b-4 border-green-500/30 dark:border-green-500/50 rounded-b-3xl overflow-hidden shadow-2xl flex items-center justify-center transition-all duration-300 relative z-10">
             
             <!-- HTML5 Canvas -->
             <canvas id="gameCanvas" class="w-full h-full block"></canvas>
@@ -385,7 +383,7 @@
         // 장애물(슬링키) 배열
         let obstacles = [];
 
-        // --- [수정사항 2] 슬링키독 레이스 배경에 반짝이는 별 파티클 데이터 배열 ---
+        // --- [추가] 슬링키독 레이스 배경에 반짝이는 별 파티클 데이터 배열 ---
         let bgStars = [];
 
         // 사람 시선 감지 (마우스 일시정지) 타이머
@@ -443,21 +441,21 @@
             }
         }
 
-        // --- [수정사항 2] 은은한 별 파티클 생성 시스템 ---
+        // --- [추가] 은은한 별 파티클 생성 시스템 ---
         function initBgStars() {
             bgStars = [];
-            const starCount = 35; // 화면 크기에 적절한 은은한 별 개수
+            const starCount = 80; // 은하수의 깊은 공간감 구현
             const width = canvas.logicalWidth || 800;
             const height = canvas.logicalHeight || 500;
             for (let i = 0; i < starCount; i++) {
                 bgStars.push({
                     x: Math.random() * width,
                     y: Math.random() * height,
-                    size: 1 + Math.random() * 2,
-                    opacity: 0.1 + Math.random() * 0.75, // 불규칙한 초기 투명도
-                    speed: 0.01 + Math.random() * 0.04,   // 깜빡이는 속도
+                    size: 1.2 + Math.random() * 2.8,
+                    opacity: 0.35 + Math.random() * 0.65, // 은하수가 잘 보이게 보정
+                    speed: 0.02 + Math.random() * 0.04,   // 깜빡임 속도감
                     phase: Math.random() * Math.PI * 2,    // 사인파 위상 랜덤화
-                    flowSpeed: 0.2 + Math.random() * 0.5 // 우주감이 나도록 슬며시 뒤로 흘러가는 속도
+                    flowSpeed: 0.3 + Math.random() * 0.7 // 배경 별빛이 뒤로 흘러가는 속도
                 });
             }
         }
@@ -496,7 +494,6 @@
         window.addEventListener('resize', resizeCanvas);
 
         // --- 4. 마우스 움직임 감지 (사람 등장!) 일시정지 기믹 개선 ---
-        // 사용자가 영화를 편하게 읽을 수 있게 "게임 컨테이너 위에 마우스가 올라가 있을 때만" 감지합니다.
         function triggerHumanWatch() {
             if (game.state !== 'PLAYING') return;
 
@@ -576,8 +573,7 @@
         });
 
         // --- 6. 드로잉 모듈 ---
-
-        // 버즈 라이트이어 그리기 (탑다운 뷰)
+        // 버즈 라이트이어 탑다운 데이터
         function drawBuzz(ctx, p) {
             ctx.save();
             ctx.translate(p.x, p.y);
@@ -789,7 +785,7 @@
             player.y += (player.targetY - player.y) * (player.speed * (deltaTime / 1000));
             player.x += (player.targetX - player.x) * (player.speed * (deltaTime / 1000));
 
-            // [수정사항 2] 은은한 별빛 파티클 흐름 및 무한루프 처리
+            // [추가] 은은한 별빛 파티클 흐름 및 무한루프 처리
             bgStars.forEach(star => {
                 star.phase += star.speed * (deltaTime / 16);
                 // 사인파를 적용하여 부드럽게 반짝임(Twinkle) 표현
@@ -858,11 +854,59 @@
             });
         }
 
-        // 전체 화면 그리기 (명확한 흰색 라인 처리)
+        // 전체 화면 그리기 (다크모드 및 라인 네온화 완벽 지원)
         function draw() {
             ctx.clearRect(0, 0, canvas.logicalWidth, canvas.logicalHeight);
 
-            // [수정사항 2] 게임 판에 은은히 깜빡이는 별빛 파티클 렌더링 (가장 아래 레이어)
+            // [추가] 현재 다크모드 상태 검증
+            const isDark = document.documentElement.classList.contains('dark');
+
+            // 1. [수정] 밤/낮 모드에 부합하는 초록 들판 텍스처 실시간 드로잉
+            if (isDark) {
+                // 어둡고 깊이감 있는 은하수 잔디밭 (다크 그린 & 네이비 조화)
+                ctx.fillStyle = '#064e3b'; 
+                ctx.fillRect(0, 0, canvas.logicalWidth, canvas.logicalHeight);
+
+                ctx.fillStyle = 'rgba(16, 185, 129, 0.08)';
+                for (let x = 0; x < canvas.logicalWidth + 50; x += 50) {
+                    for (let y = 0; y < canvas.logicalHeight + 50; y += 50) {
+                        ctx.beginPath();
+                        ctx.arc(x, y, 7, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+                ctx.fillStyle = 'rgba(2, 44, 34, 0.25)';
+                for (let x = 25; x < canvas.logicalWidth + 50; x += 50) {
+                    for (let y = 25; y < canvas.logicalHeight + 50; y += 50) {
+                        ctx.beginPath();
+                        ctx.arc(x, y, 7, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+            } else {
+                // 생기 넘치는 주간 초록 들판
+                ctx.fillStyle = '#38a169'; 
+                ctx.fillRect(0, 0, canvas.logicalWidth, canvas.logicalHeight);
+
+                ctx.fillStyle = 'rgba(72, 187, 120, 0.4)';
+                for (let x = 0; x < canvas.logicalWidth + 50; x += 50) {
+                    for (let y = 0; y < canvas.logicalHeight + 50; y += 50) {
+                        ctx.beginPath();
+                        ctx.arc(x, y, 7, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+                ctx.fillStyle = 'rgba(47, 133, 90, 0.4)';
+                for (let x = 25; x < canvas.logicalWidth + 50; x += 50) {
+                    for (let y = 25; y < canvas.logicalHeight + 50; y += 50) {
+                        ctx.beginPath();
+                        ctx.arc(x, y, 7, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+            }
+
+            // [추가] 게임 판에 은은히 깜빡이는 별빛 파티클 렌더링 (가장 아래 레이어)
             bgStars.forEach(star => {
                 ctx.fillStyle = `rgba(255, 255, 255, ${star.currentOpacity})`;
                 ctx.beginPath();
@@ -876,18 +920,18 @@
             for (let i = 0; i < game.laneCount; i++) {
                 // 짝수 번째 레인 뒤에는 살짝 불투명한 하이라이트를 주어 공간을 가시화함
                 if (i % 2 === 0) {
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.04)';
+                    ctx.fillStyle = isDark ? 'rgba(52, 211, 153, 0.02)' : 'rgba(255, 255, 255, 0.04)';
                     ctx.fillRect(0, i * laneHeight, canvas.logicalWidth, laneHeight);
                 }
 
                 // 각 줄 좌측 끝에 심플한 차선 번호 마크 그리기 (공간 가시성 향상)
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.fillStyle = isDark ? 'rgba(52, 211, 153, 0.4)' : 'rgba(255, 255, 255, 0.3)';
                 ctx.font = 'bold 12px "Nanum Gothic"';
                 ctx.fillText(`LANE ${i + 1}`, 15, i * laneHeight + 20);
             }
 
-            // 줄 사이에 명확한 흰색 선을 선명하고 또렷하게 표시
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)'; // 한눈에 띄는 선명한 흰색 라인
+            // [수정] 다크모드 시 네온 느낌의 아쿠아 블루 광선으로 차선 구분 가속화
+            ctx.strokeStyle = isDark ? 'rgba(56, 189, 248, 0.6)' : 'rgba(255, 255, 255, 0.5)';
             ctx.lineWidth = 3;                             // 두께감 있는 선
             ctx.setLineDash([15, 10]);                     // 점선 간격 최적화
             
@@ -900,7 +944,7 @@
             ctx.setLineDash([]); // 라인 세팅 초기화
 
             // 2. 들판 잔디 풀밭 데코레이션
-            ctx.fillStyle = 'rgba(255,255,255,0.08)';
+            ctx.fillStyle = isDark ? 'rgba(110, 231, 183, 0.12)' : 'rgba(255, 255, 255, 0.08)';
             for (let i = 0; i < 6; i++) {
                 const gx = (canvas.logicalWidth / 5 * i + 80) % canvas.logicalWidth;
                 const gy = (350 * i + 70) % canvas.logicalHeight;
@@ -910,7 +954,7 @@
             }
 
             // 3. 현재 버즈의 활성화된 라인을 살짝 표시해 주는 유도 광선 (옵션 효과)
-            ctx.fillStyle = 'rgba(129, 230, 217, 0.08)'; // 하늘빛 살짝 비침
+            ctx.fillStyle = isDark ? 'rgba(56, 189, 248, 0.08)' : 'rgba(129, 230, 217, 0.08)';
             ctx.fillRect(0, player.lane * laneHeight, canvas.logicalWidth, laneHeight);
 
             // 4. 장애물 렌더링
@@ -1023,6 +1067,8 @@
                 localStorage.setItem('theme', 'dark');
             }
             updateTheme();
+            // [수정] 테마 변경 시 캔버스 즉시 다시 그려서 끊김 없는 비주얼 제공
+            draw();
         });
 
         // 초기 스타트
